@@ -1,43 +1,16 @@
 const express = require("express");
 const mongojs = require("mongojs");
-const db = mongojs("dzelalovadb", ["accounts"]);
-
+const routes = require("./routes");
 const app = express();
 
+const db = mongojs("dzelalovadb", ["accounts"]);
+
 app.set("view engine", "ejs");
-
 app.use(express.urlencoded({ extended: false }));
-app.get("/", (req, res) => {
-  db.accounts.find((err, data) => {
-    res.render("index", { data: data });
-  });
-});
 
-app.post("/save", (req, res) => {
-  db.accounts.insert(
-    {
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      email: req.body.email,
-      phone: req.body.phone,
-    },
-    (err, data) => {
-      res.redirect("/");
-    }
-  );
-});
+app.use(routes);
 
-app.get("/edit", (req, res) => {
-  db.accounts.find((err, data) => {
-    res.render("edit-view", { data: data });
-  });
-});
-
-app.get("/add", (req, res) => {
-  res.render("add-view");
-});
-
-app.get("/delete_acc/:id", (req, res) => {
+app.get("delete_acc/:id", (req, res) => {
   let id = req.params.id;
   db.accounts.remove({ _id: db.ObjectId(id) }, (err, data) => {
     res.redirect("/");
